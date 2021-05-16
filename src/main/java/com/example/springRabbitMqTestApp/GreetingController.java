@@ -1,6 +1,7 @@
 package com.example.springRabbitMqTestApp;
 
 import com.example.springRabbitMqTestApp.domain.Person;
+import com.example.springRabbitMqTestApp.rabbitmq.RabbitMqConsumer;
 import com.example.springRabbitMqTestApp.rabbitmq.RabbitMqProducer;
 import com.example.springRabbitMqTestApp.rabbitmq.RabbitPersonMessage;
 import com.example.springRabbitMqTestApp.repos.PersonRepo;
@@ -40,19 +41,9 @@ public class GreetingController {
 
     @PostMapping
     public String add(@RequestParam String name, @RequestParam String firstname, @RequestParam String lastname, @RequestParam String birthdate, Map<String, Object> model) {
-
         Date date = Date.valueOf(birthdate);
         Person person = new Person(name, firstname, lastname, date);
-        try {
-            personRepo.save(mqProcess(person));
-        } catch (Exception e) {
-
-        }
-
-        Iterable<Person> persons = personRepo.findAll();
-
-        model.put("persons", persons);
-
+        mqProcess(person);
         return "main";
     }
 

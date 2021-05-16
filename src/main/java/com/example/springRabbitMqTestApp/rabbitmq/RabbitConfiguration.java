@@ -74,12 +74,8 @@ public class RabbitConfiguration {
         return factory;
     }
 
-    /*
     @Bean
-    public RabbitMqConsumer rabbitMqConsumer(){
+    public RabbitMqConsumer getRabbitMqConsumer(){
         return new RabbitMqConsumer();
     }
-    */
-
-
 }

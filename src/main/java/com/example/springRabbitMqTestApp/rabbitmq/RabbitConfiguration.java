@@ -1,48 +1,39 @@
 package com.example.springRabbitMqTestApp.rabbitmq;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
 
 @Configuration
 public class RabbitConfiguration {
 
     Logger logger = Logger.getLogger(RabbitConfiguration.class.getName());
 
-    /*
-    private String host = "localhost";
-    private String user = "guest";
-    private String password = "guest";
-    private int port = 5672;
+    public static String qName = "queue.test";
+
+    //----------------------------------Producer:
 
     @Bean
-    public ConnectionFactory connectionFactory() {
-        CachingConnectionFactory factory = new CachingConnectionFactory();
-        factory.setHost(host);
-        factory.setPort(port);
-        factory.setVirtualHost("/");
-        factory.setUsername(user);
-        factory.setPassword(password);
-        return factory;
+    public Queue queue() {
+        return new Queue(qName, false);
     }
-    */
 
-    /*
     @Bean
-    public MappingJackson2MessageConverter jackson2Converter() {
-        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
-        return converter;
+    TopicExchange exchange() {
+        return new TopicExchange("exchange");
     }
-    */
+
+    @Bean
+    Binding bindingExchangeFoo(Queue queue, TopicExchange exchange) {
+        return BindingBuilder.bind(queue).to(exchange).with("queue.test");
+    }
 
     @Bean
     public ConnectionFactory connectionFactory() {
@@ -65,16 +56,30 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public Queue myQueue() {
-        return new Queue("test");
+    public RabbitMqProducer getRabbitMqProducer(){
+        return new RabbitMqProducer();
+    }
+
+    //-----------------------------------Consumer:
+    @Bean
+    public MappingJackson2MessageConverter jackson2Converter() {
+        MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();
+        return converter;
     }
 
     @Bean
-    public SimpleMessageListenerContainer messageListenerContainer() {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory());
-        container.setQueueNames("test");
-        container.setMessageListener(message -> logger.log(Level.INFO, new String(message.getBody())));
-        return container;
+    public DefaultMessageHandlerMethodFactory myHandlerMethodFactory() {
+        DefaultMessageHandlerMethodFactory factory = new DefaultMessageHandlerMethodFactory();
+        factory.setMessageConverter(jackson2Converter());
+        return factory;
     }
+
+    /*
+    @Bean
+    public RabbitMqConsumer rabbitMqConsumer(){
+        return new RabbitMqConsumer();
+    }
+    */
+
+
 }

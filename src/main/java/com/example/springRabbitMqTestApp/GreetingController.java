@@ -1,6 +1,8 @@
 package com.example.springRabbitMqTestApp;
 
 import com.example.springRabbitMqTestApp.domain.Person;
+import com.example.springRabbitMqTestApp.rabbitmq.RabbitMqProducer;
+import com.example.springRabbitMqTestApp.rabbitmq.RabbitPersonMessage;
 import com.example.springRabbitMqTestApp.repos.PersonRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -42,7 +44,7 @@ public class GreetingController {
         Date date = Date.valueOf(birthdate);
         Person person = new Person(name, firstname, lastname, date);
         try {
-            personRepo.save(person);
+            personRepo.save(mqProcess(person));
         } catch (Exception e) {
 
         }
@@ -70,5 +72,24 @@ public class GreetingController {
         }
 
         return "main";
+    }
+
+    @GetMapping("test")
+    public String test() {
+        mqProcess(new Person("Злопупенцев", "Грязномаз", "Старообрядович"));
+        return "main";
+    }
+
+    @Autowired
+    private RabbitMqProducer rabbitMqProducer;
+
+    /**
+     * Согласно ТЗ метод сначала отправляет полученные данные в MQRabbit, а потом сразу вычитывает
+     * их и отправляет в postgress.
+     */
+    private Person mqProcess(Person person){
+        RabbitPersonMessage message = new RabbitPersonMessage(person);
+        rabbitMqProducer.sendToRabbitmq(message);
+        return person;
     }
 }

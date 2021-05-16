@@ -6,12 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class ProducerApplication implements CommandLineRunner {
+    /*
 
     public static void main(String[] args) {
         SpringApplication.run(ProducerApplication.class, args);
     }
 
-    /*
     @Bean
     Queue queueFoo() {
         return new Queue("queue.foo", false);

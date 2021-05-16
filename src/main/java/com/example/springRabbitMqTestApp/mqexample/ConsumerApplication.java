@@ -15,11 +15,12 @@ import org.springframework.stereotype.Service;
 @SpringBootApplication
 @EnableRabbit
 public class ConsumerApplication implements RabbitListenerConfigurer {
+    /*
 
     public static void main(String[] args) {
         SpringApplication.run(ConsumerApplication.class, args);
     }
-/*
+
     @Bean
     public MappingJackson2MessageConverter jackson2Converter() {
         MappingJackson2MessageConverter converter = new MappingJackson2MessageConverter();

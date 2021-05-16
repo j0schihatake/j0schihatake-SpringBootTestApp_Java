@@ -1,15 +1,12 @@
-package com.example.springRabbitMqTestApp.domain;
+package com.example.springRabbitMqTestApp.rabbitmq;
 
-import javax.persistence.*;
+import com.example.springRabbitMqTestApp.domain.Person;
+
+import java.io.Serializable;
 import java.sql.Date;
 
-@Entity
-public class Person {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Integer id;
+public class RabbitPersonMessage implements Serializable {
 
-    @Column(unique = true)
     private String name;
 
     private String firstName;
@@ -18,29 +15,22 @@ public class Person {
 
     private Date birthDate;
 
-
-    public Person() {
+    public RabbitPersonMessage(){
+        this.name = "new";
+        this.firstName = "new";
+        this.lastName = "new";
+        this.birthDate = null;
     }
 
-    public Person(String firstName, String name, String lastName, Date birthDate) {
-        this.name = name;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
+    public RabbitPersonMessage(Person person){
+        this.name = person.getName();
+        this.firstName = person.getFirstName();
+        this.lastName = person.getLastName();
+        this.birthDate = person.getBirthDate();
     }
 
-    public Person(String firstName, String name, String lastName) {
-        this.name = name;
-        this.firstName = firstName;
-        this.lastName = lastName;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+    public static Person rabbitPersonMessageToPerson(RabbitPersonMessage rpm){
+        return new Person(rpm.firstName, rpm.name, rpm.lastName, rpm.birthDate);
     }
 
     public String getName() {
@@ -74,4 +64,6 @@ public class Person {
     public void setBirthDate(Date birthDate) {
         this.birthDate = birthDate;
     }
+
+
 }

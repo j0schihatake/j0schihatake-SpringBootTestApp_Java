@@ -1,34 +1,21 @@
 package com.example.springRabbitMqTestApp.rabbitmq;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.core.RabbitMessagingTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.stereotype.Service;
 
-@RestController
-public class RabbitMqProducer {
-
-    Logger logger = Logger.getLogger(RabbitMqProducer.class);
+@Service
+public class RabbitMqProducer{
 
     @Autowired
-    public Queue myQueue;
-
-    private final AmqpTemplate amqpTemplate;
+    private RabbitMessagingTemplate rabbitMessagingTemplate;
 
     @Autowired
-    public RabbitMqProducer(AmqpTemplate amqpTemplate){
-        this.amqpTemplate = amqpTemplate;
-    }
+    private MappingJackson2MessageConverter mappingJackson2MessageConverter;
 
-    @PostMapping("/msg")
-    public ResponseEntity<String> msg(@RequestBody String message){
-        logger.log(Level.INFO, "msg в rabbitMQ");
-        amqpTemplate.convertAndSend(myQueue.getName(),message);
-        return ResponseEntity.ok("Сообщение доставлено.");
+    public void sendToRabbitmq(RabbitPersonMessage message) {
+        this.rabbitMessagingTemplate.setMessageConverter(this.mappingJackson2MessageConverter);
+        this.rabbitMessagingTemplate.convertAndSend("exchange", "queue.test", message);
     }
 }

@@ -1,7 +1,21 @@
 version: "3.6"
 # https://docs.docker.com/compose/compose-file/
 services:
-  rabbitmq:
+  postgres-container:
+    container_name: postgres-container
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /data/postgres
+    volumes:
+    - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+    ports:
+    - '5432:5432'
+    restart: unless-stopped
+
+  rabbitmq-container:
+    container_name: rabbitmq-container
     image: 'rabbitmq:3.6-management-alpine'
     ports:
     # The standard AMQP protocol port
@@ -16,8 +30,7 @@ services:
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
       RABBITMQ_DEFAULT_USER: "guest"
       RABBITMQ_DEFAULT_PASS: "guest"
-    networks:
-    - network
+
 networks:
   # Declare our private network.  We must declare one for the magic
   # Docker DNS to work, but otherwise its default settings are fine.

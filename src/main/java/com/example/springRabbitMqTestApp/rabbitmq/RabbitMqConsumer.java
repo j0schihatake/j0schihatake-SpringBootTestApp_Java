@@ -34,9 +34,5 @@ public class RabbitMqConsumer implements RabbitListenerConfigurer {
         try {
             personRepo.save(RabbitPersonMessage.rabbitPersonMessageToPerson(message));
         } catch (Exception e) {}
-
-        Iterable<Person> persons = personRepo.findAll();
-
-        //model.put("persons", persons);
     }
 }

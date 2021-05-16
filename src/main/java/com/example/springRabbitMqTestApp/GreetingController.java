@@ -44,6 +44,8 @@ public class GreetingController {
         Date date = Date.valueOf(birthdate);
         Person person = new Person(name, firstname, lastname, date);
         mqProcess(person);
+        Iterable<Person> persons = personRepo.findAll();
+        model.put("persons", persons);
         return "main";
     }
 
